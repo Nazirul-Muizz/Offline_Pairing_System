@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (QDialog, QLabel, QComboBox, QLineEdit,
                                QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget)
 from PySide6.QtCore import Qt
 import sys
-from backend.validation import validate_wo_number
+from backend.validation import VALIDATORS
 
 
 class ConfigDialog(QDialog):
@@ -47,7 +47,7 @@ class ConfigDialog(QDialog):
         if self.widgets:
             self.widgets[0].setEnabled(True)
         
-        for i, widget in enumerate(self.widgets[:-1]):
+        for i, widget in enumerate(self.widgets):
             widget.textChanged.connect(
                 lambda text, i=i: self._on_field_changed(i, text)
             )
@@ -71,27 +71,56 @@ class ConfigDialog(QDialog):
         self.confirm_btn.clicked.connect(self.confirm)
         self.cancel_btn.clicked.connect(self.cancel)
     
+    def _check_all_valid(self):
+        for i, field in enumerate(self.fields):
+            widget = self.widgets[i]
+            value = widget.text()
+
+            validator_key = field.get("validator")
+
+            if validator_key:
+                validator = VALIDATORS.get(validator_key)
+                if validator:
+                    valid, _ = validator(value)
+                    if not valid:
+                        return False
+
+        return True
+    
     def _on_field_changed(self, index, text):
+        field = self.fields[index]
         widget = self.widgets[index]
 
-        # Special case: WO validation
-        if index == self.wo_index:
-            valid, msg = validate_wo_number(text)
+        value = text
 
-            if valid:
-                widget.setStyleSheet("border: 2px solid green;")
-                self.confirm_btn.setEnabled(True)
-            else:
+        if field["type"] == "int":
+            # block invalid typing early
+            if not value.isdigit() and value != "":
                 widget.setStyleSheet("border: 2px solid red;")
-                self.confirm_btn.setEnabled(False)
-                return  # block progression if invalid
+                return
 
-        # Enable next field
-        self._enable_next(index)
+        elif field["type"] == "str":
+            value = value.strip()
 
-    # ---------------------------
-    # Enable next field
-    # ---------------------------
+        validator_key = field.get("validator")
+        valid, msg = True, ""
+
+        if validator_key:
+            validator = VALIDATORS.get(validator_key)
+            if validator:
+                valid, msg = validator(value)
+        
+        if valid:
+            widget.setStyleSheet("border: 2px solid green;")
+            self._enable_next(index)
+        else:
+            widget.setStyleSheet("border: 2px solid red;")
+
+        if self._check_all_valid():
+            self.confirm_btn.setEnabled(True)
+        else:
+            self.confirm_btn.setEnabled(False)
+
     def _enable_next(self, index):
         if index + 1 < len(self.widgets):
             self.widgets[index + 1].setEnabled(True)

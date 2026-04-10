@@ -1,6 +1,6 @@
-# --- Show mandatory dialog on startup ---
+
 fields = [
-    {'label': 'WO Number', 'type': 'text'},
-    {'label': 'WO Quantity', 'type': 'text'}
+    {'label': 'WO Number', 'type': 'text', 'validator': 'wo_number'},
+    {'label': 'WO Quantity', 'type': 'int', 'validator': 'wo_quantity'},
 ]
 
