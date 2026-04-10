@@ -2,6 +2,8 @@ from PySide6.QtWidgets import (QDialog, QLabel, QComboBox, QLineEdit,
                                QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget)
 from PySide6.QtCore import Qt
 import sys
+from backend.validation import validate_wo_number
+
 
 class ConfigDialog(QDialog):
     """
@@ -12,7 +14,7 @@ class ConfigDialog(QDialog):
     - Fields are enabled only in order
     - Confirm validates all entries
     """
-    def __init__(self, fields, title="Software Configuration", size=(700, 350)):
+    def __init__(self, fields, title="Software Configuration", size=(300, 150)):
         
         super().__init__()
         self.setWindowTitle(title)
@@ -21,70 +23,81 @@ class ConfigDialog(QDialog):
         self.fields = fields
         self.widgets = []  # list of widgets in order
 
+        self.wo_index = None
+
         # --- Layout ---
         layout = QVBoxLayout()
 
-        for field in self.fields:
+        for i, field in enumerate(self.fields):
             label = QLabel(f"{field['label']}:")
             layout.addWidget(label)
-            
-            if field['type'] == 'dropdown':
-                widget = QComboBox()
-                widget.addItem("Select...")
-                widget.addItems(field.get('options', []))
-            elif field['type'] == 'text':
-                widget = QLineEdit()
-            else:
-                raise ValueError(f"Unknown field type: {field['type']}")
-            
+
+            widget = QLineEdit()
+
             layout.addWidget(widget)
-            widget.setEnabled(False)  # initially all disabled
+            widget.setEnabled(False)
+
             self.widgets.append(widget)
 
+            # Track WO field index
+            if field['label'] == "WO Number":
+                self.wo_index = i
+
         # Enable first field
-        self.widgets[0].setEnabled(True)
+        if self.widgets:
+            self.widgets[0].setEnabled(True)
+        
+        for i, widget in enumerate(self.widgets[:-1]):
+            widget.textChanged.connect(
+                lambda text, i=i: self._on_field_changed(i, text)
+            )
 
         # --- Buttons ---
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
+
         self.confirm_btn = QPushButton("Confirm")
         self.cancel_btn = QPushButton("Cancel")
+
         btn_layout.addWidget(self.confirm_btn)
         btn_layout.addWidget(self.cancel_btn)
+
+        self.confirm_btn.setEnabled(False)
+
         layout.addLayout(btn_layout)
 
         self.setLayout(layout)
 
-        # --- Signals ---
-        for i, widget in enumerate(self.widgets[:-1]):
-            if isinstance(widget, QComboBox):
-                widget.currentIndexChanged.connect(lambda idx, i=i: self._enable_next(i))
-            elif isinstance(widget, QLineEdit):
-                widget.textChanged.connect(lambda text, i=i: self._enable_next(i))
-        
         self.confirm_btn.clicked.connect(self.confirm)
         self.cancel_btn.clicked.connect(self.cancel)
-
-    def _enable_next(self, index):
-        """Enable the next field only if current is filled/selected"""
+    
+    def _on_field_changed(self, index, text):
         widget = self.widgets[index]
-        next_widget = self.widgets[index + 1]
-        if isinstance(widget, QComboBox):
-            next_widget.setEnabled(widget.currentIndex() > 0)
-        elif isinstance(widget, QLineEdit):
-            next_widget.setEnabled(bool(widget.text().strip()))
 
+        # Special case: WO validation
+        if index == self.wo_index:
+            valid, msg = validate_wo_number(text)
+
+            if valid:
+                widget.setStyleSheet("border: 2px solid green;")
+                self.confirm_btn.setEnabled(True)
+            else:
+                widget.setStyleSheet("border: 2px solid red;")
+                self.confirm_btn.setEnabled(False)
+                return  # block progression if invalid
+
+        # Enable next field
+        self._enable_next(index)
+
+    # ---------------------------
+    # Enable next field
+    # ---------------------------
+    def _enable_next(self, index):
+        if index + 1 < len(self.widgets):
+            self.widgets[index + 1].setEnabled(True)
+
+            
     def confirm(self):
-        """Check all fields in order and show warnings if missing"""
-        for i, (field, widget) in enumerate(zip(self.fields, self.widgets)):
-            if isinstance(widget, QComboBox) and widget.currentIndex() == 0:
-                QMessageBox.warning(self, "Warning", f"SELECT {field['label'].upper()} FIRST")
-                return
-            if isinstance(widget, QLineEdit) and not widget.text().strip():
-                QMessageBox.warning(self, "Warning", f"ENTER {field['label'].upper()}")
-                return
-
-        #QMessageBox.information(self, "Success", "All data entered correctly!")
         self.accept()
 
     def cancel(self):
