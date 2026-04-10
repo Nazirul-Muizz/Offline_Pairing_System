@@ -3,6 +3,7 @@ from PySide6 import QtWidgets, QtCore
 from .form_window import ConfigDialog
 from db.connection import Database
 from .constants import fields
+from backend.config_manager import ConfigManager, CONFIG_PATH
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -11,6 +12,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.db = Database()
         self.resize(1400, 900)
 
+        config_manager = ConfigManager(CONFIG_PATH)
+        print("Loaded config:", config_manager.config_data)
         dialog = ConfigDialog(fields)
         
         if dialog.exec() == QtWidgets.QDialog.Accepted:
@@ -20,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
             }
             print("Data entered:", self.project_data)
 
-        title = QtWidgets.QLabel("Offline Pairing", alignment=QtCore.Qt.AlignCenter)
+        title = QtWidgets.QLabel(f"{config_manager.config_data['project']}_{config_manager.config_data['line']}_{config_manager.config_data['station']}", alignment=QtCore.Qt.AlignCenter)
         
         title.setStyleSheet("font-size: 32px; font-weight: bold; color: black; border: 4px solid black; padding: 20px; background-color: yellow;")
 

@@ -2,18 +2,10 @@ from PySide6.QtWidgets import (QDialog, QLabel, QComboBox, QLineEdit,
                                QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget)
 from PySide6.QtCore import Qt
 import sys
-from backend.validation import VALIDATORS
-
+from backend.form_validation import VALIDATORS
 
 class ConfigDialog(QDialog):
-    """
-    A reusable mandatory dialog:
-    - Fields are provided in order
-    - Dropdowns have predefined options
-    - Text fields are open input
-    - Fields are enabled only in order
-    - Confirm validates all entries
-    """
+
     def __init__(self, fields, title="Software Configuration", size=(300, 150)):
         
         super().__init__()
