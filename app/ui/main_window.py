@@ -1,6 +1,5 @@
 #print("Hello, World!")
 from PySide6 import QtWidgets, QtCore, QtGui
-from .form_window import ConfigDialog
 from db.connection import Database
 from .constants import fields, stations, project, line, station
 # from backend.config_manager import ConfigManager, CONFIG_PATH

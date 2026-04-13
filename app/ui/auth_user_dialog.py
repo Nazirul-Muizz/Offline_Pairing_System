@@ -27,7 +27,7 @@ class AuthorizeUser(QtWidgets.QDialog):
         self.cancel_button.clicked.connect(self.reject)
 
     def check_password(self):
-        if self.password_input.text() == password:  # Replace with secure password handling
+        if self.password_input.text() == password:
             self.accept()
         else:
             QtWidgets.QMessageBox.warning(self, "Error", "Incorrect password!")

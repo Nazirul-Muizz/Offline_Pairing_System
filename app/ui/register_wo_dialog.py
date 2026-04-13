@@ -5,7 +5,7 @@ import sys
 from backend.form_validation import VALIDATORS
 from db.connection import Database
 
-class ConfigDialog(QDialog):
+class RegisterDialog(QDialog):
 
     def __init__(self, fields, title="Software Configuration", size=(300, 150)):
         
@@ -123,6 +123,7 @@ class ConfigDialog(QDialog):
         print(f"Inserting WO: {wo_number} with Quantity: {wo_quantity}")
         db = Database()
         db.insert_config_data(project, line, station, wo_number, wo_quantity)
+        
 
     def confirm(self):
         self.accept()

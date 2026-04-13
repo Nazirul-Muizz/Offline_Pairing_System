@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (QDialog, QLabel, QComboBox, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget)
 from PySide6.QtCore import Qt
 from .auth_user import AuthorizeUser
-from .form_window import ConfigDialog
+from .register_wo_dialog import RegisterDialog
 from .constants import fields, project, line, station
 from db.connection import Database
 
@@ -47,7 +47,7 @@ class SettingDialog(QDialog):
 
     def create_new_wo(self):
         # Placeholder for config logic
-        dialog = ConfigDialog(fields)
+        dialog = RegisterDialog(fields)
         if dialog.exec() == QDialog.Accepted:
             self.project_data = {
                 field['label']: (widget.currentText() if isinstance(widget, QComboBox) else widget.text())
