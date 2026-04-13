@@ -2,11 +2,11 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from .form_window import ConfigDialog
 from db.connection import Database
-from .constants import fields, stations
-from backend.config_manager import ConfigManager, CONFIG_PATH
+from .constants import fields, stations, project, line, station
+# from backend.config_manager import ConfigManager, CONFIG_PATH
 from .category import motor_pairing, pump_pairing, carton_pairing
 from .setting import SettingDialog
-from .auth_user import AuthorizeUser
+from backend.main_validation import validate_wip_number
 import os
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -15,23 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Offline Pairing")
         self.db = Database()
         self.db.create_config_table()
-        self.resize(1400, 900)
-
-        config_manager = ConfigManager(CONFIG_PATH)
-        print("Loaded config:", config_manager.config_data)
-        
-        """
-        if dialog.exec() == QtWidgets.QDialog.Accepted:
-            self.project_data = {
-                field['label']: (widget.currentText() if isinstance(widget, QtWidgets.QComboBox) else widget.text())
-                for field, widget in zip(fields, dialog.widgets)
-            }
-            print("Data entered:", self.project_data)
-        """
-
-        project = config_manager.config_data['project']
-        line = config_manager.config_data['line']
-        station = config_manager.config_data['station']
+        self.setMinimumSize(1400, 900)
 
         title = QtWidgets.QLabel(
             f"{project}_{line}_{stations.get(station, station)}", 
@@ -84,9 +68,6 @@ class MainWindow(QtWidgets.QMainWindow):
         top_layout.addWidget(title, alignment=QtCore.Qt.AlignCenter, stretch=10)
         top_layout.addWidget(QtWidgets.QWidget(), stretch=1)  # empty space on the right
 
-        #top_layout.setStyleSheet("border: 4px solid black; padding: 20px; background-color: yellow;")
-
-        #main_layout.addLayout(top_layout)
         main_layout.addWidget(top_container)
 
         # Interactive Layout
@@ -96,6 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         input_field = QtWidgets.QLineEdit()
         input_field.setStyleSheet("font-size: 24px; color: black; background-color: white; border: 2px solid black; padding: 10px;")
+        input_field.returnPressed.connect(lambda: self.handle_scan(status_bar, input_field))
 
         input_label = QtWidgets.QLabel("Serial Number:", alignment=QtCore.Qt.AlignCenter)
         input_label.setStyleSheet("font-size: 24px; color: black; bold: true;")
@@ -121,10 +103,30 @@ class MainWindow(QtWidgets.QMainWindow):
         main_layout.addLayout(interactive_layout, stretch=1)
         main_layout.addLayout(content_layout, stretch=5)
     
-    def closeEvent(self, event):
+    def close_event(self, event):
         self.db.close_connection()
         event.accept()
         print("Database connection closed.")
+
+    def handle_scan(self, status_bar, input_field):
+        print("Scanned")
+        
+        validate_wip_number(input_field.text())
+        print("Validation result:", validate_wip_number(input_field.text()))
+
+        if validate_wip_number(input_field.text())[0] == True:
+            status_bar.setText(f"PASS: {input_field.text()}")
+            status_bar.setStyleSheet("font-size: 24px; color: white; background-color: green; border: 2px solid white; padding: 10px;")
+        else:
+            status_bar.setText("FAILED: Invalid WIP")
+            status_bar.setStyleSheet("font-size: 24px; color: white; background-color: red; border: 2px solid white; padding: 10px;")
+        input_field.clear()
+
+        QtCore.QTimer.singleShot(2000, lambda: self.reset_status_bar(status_bar))
+    
+    def reset_status_bar(self, status_bar):
+        status_bar.setText(f"Please scan the WIP") 
+        status_bar.setStyleSheet("font-size: 24px; color: black; background-color: lightgray; border: 2px solid white; padding: 10px;")
 
 
 

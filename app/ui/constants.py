@@ -1,4 +1,7 @@
 
+from backend.config_manager import CONFIG_PATH, ConfigManager
+
+
 fields = [
     {'label': 'WO Number', 'type': 'text', 'validator': 'wo_number'},
     {'label': 'WO Quantity', 'type': 'int', 'validator': 'wo_quantity'},
@@ -19,6 +22,12 @@ config = [
     }
 
 ]
+
+config_manager = ConfigManager(CONFIG_PATH)
+
+project = config_manager.config_data['project']
+line = config_manager.config_data['line']
+station = config_manager.config_data['station']
 
 stations = {
     'MTRP': 'Motor_Pairing',

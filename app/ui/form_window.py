@@ -3,6 +3,7 @@ from PySide6.QtWidgets import (QDialog, QLabel, QLineEdit,
 from PySide6.QtCore import Qt
 import sys
 from backend.form_validation import VALIDATORS
+from db.connection import Database
 
 class ConfigDialog(QDialog):
 
@@ -116,13 +117,18 @@ class ConfigDialog(QDialog):
     def _enable_next(self, index):
         if index + 1 < len(self.widgets):
             self.widgets[index + 1].setEnabled(True)
+    
+    def insert_new_wo(self, project, line, station, wo_number, wo_quantity):
+        # Placeholder for database insertion logic
+        print(f"Inserting WO: {wo_number} with Quantity: {wo_quantity}")
+        db = Database()
+        db.insert_config_data(project, line, station, wo_number, wo_quantity)
 
-            
     def confirm(self):
         self.accept()
 
     def cancel(self):
-        sys.exit(0)
+        self.reject()
 
-    def closeEvent(self, event):
-        sys.exit(0)
+    def close_event(self, event):
+        self.reject()

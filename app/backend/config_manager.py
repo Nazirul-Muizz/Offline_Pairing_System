@@ -1,7 +1,7 @@
 import os
 
 class ConfigManager:
-    def __init__(self, config_file='config.txt'):
+    def __init__(self, config_file='manual_config.txt'):
         self.config_file = config_file
         self.config_data = {
             'project': None,

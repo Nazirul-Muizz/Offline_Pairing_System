@@ -26,7 +26,7 @@ def validate_ean_number():
 
 def validate_wip_number(wip_number):
     wip_number = wip_number.upper()  # Convert to uppercase for consistent validation
-    pattern = r"^[A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{5}[A-Z]{2}[0-9]{5}$"
+    pattern = r"^[A-Z0-9]{6}[A-Z0-9]{4}[A-Z0-9]{5}[A-Z]{2}[0-9]{7}$"
 
     if not wip_number.strip():
         return False, "WIP Number cannot be empty."
