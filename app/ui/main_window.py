@@ -2,8 +2,9 @@
 from PySide6 import QtWidgets, QtCore
 from .form_window import ConfigDialog
 from db.connection import Database
-from .constants import fields
+from .constants import fields, stations
 from backend.config_manager import ConfigManager, CONFIG_PATH
+from .category import motor_pairing, pump_pairing, carton_pairing
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -15,17 +16,33 @@ class MainWindow(QtWidgets.QMainWindow):
         config_manager = ConfigManager(CONFIG_PATH)
         print("Loaded config:", config_manager.config_data)
         dialog = ConfigDialog(fields)
-        
+
+        """
         if dialog.exec() == QtWidgets.QDialog.Accepted:
             self.project_data = {
                 field['label']: (widget.currentText() if isinstance(widget, QtWidgets.QComboBox) else widget.text())
                 for field, widget in zip(fields, dialog.widgets)
             }
             print("Data entered:", self.project_data)
+        """
 
-        title = QtWidgets.QLabel(f"{config_manager.config_data['project']}_{config_manager.config_data['line']}_{config_manager.config_data['station']}", alignment=QtCore.Qt.AlignCenter)
+        project = config_manager.config_data['project']
+        line = config_manager.config_data['line']
+        station = config_manager.config_data['station']
+
+        title = QtWidgets.QLabel(
+            f"{project}_{line}_{stations.get(station, station)}", 
+            alignment=QtCore.Qt.AlignCenter
+        )
         
         title.setStyleSheet("font-size: 32px; font-weight: bold; color: black; border: 4px solid black; padding: 20px; background-color: yellow;")
+
+        if station == "Motor_Pairing":
+            pairing = motor_pairing.MotorPairing()
+        elif station == "Pump_Pairing":
+            pairing = pump_pairing.PumpPairing()
+        elif station == "Carton_Pairing":
+            pairing = carton_pairing.CartonPairing()
 
         central = QtWidgets.QWidget()
         self.setCentralWidget(central)

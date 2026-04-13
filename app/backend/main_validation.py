@@ -1,7 +1,7 @@
 import re
 
 def create_prefix(serial_number1, serial_number2):
-    
+
     return
 
 def validate_motor_prefix():
@@ -24,6 +24,14 @@ def validate_ean_number():
 
     return
 
-def validate_wip_number():
+def validate_wip_number(wip_number):
+    wip_number = wip_number.upper()  # Convert to uppercase for consistent validation
+    pattern = r"^[A-Z0-9]{6}-[A-Z0-9]{4}-[A-Z0-9]{5}[A-Z]{2}[0-9]{5}$"
 
-    return
+    if not wip_number.strip():
+        return False, "WIP Number cannot be empty."
+    
+    if not re.match(pattern, wip_number):
+        return False, "WIP Number is not in the correct format."
+    
+    return True, f"PASS: {wip_number}"

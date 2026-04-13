@@ -1,0 +1,1 @@
+# Pairing configuration window depends on category

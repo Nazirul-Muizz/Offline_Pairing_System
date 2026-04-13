@@ -38,3 +38,10 @@ config = [
 
 ]
 
+stations = {
+    'MTRP': 'Motor_Pairing',
+    'PUMP': 'Pump_Pairing',
+    'PRPP': 'Carton_Pairing',
+    #'PCBA': 'PCBA_Pairing'
+}
+
