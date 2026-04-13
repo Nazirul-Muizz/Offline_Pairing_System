@@ -6,34 +6,16 @@ fields = [
 
 config = [
     {
-        'project': '3146',
-        'line': ['L1', 'L2', 'L3'],
-        'station': ['MTRP', 'PUMP', 'PRPP'],
-    },
-    {
-        'project': '3059',
-        'line': ['L1', 'L2', 'L3'],
-        'station': ['MTRP', 'PRPP'],
-    },
-    {
-        'project': '2977',
-        'line': ['L1'],
-        'station': ['MTRP', 'PRPP'],
-    },
-    {
-        'project': '2996',
-        'line': ['L2'],
-        'station': ['MTRP', 'PCBA', 'PUMP', 'PRPP'],
-    },
-    {
-        'project': '3028',
-        'line': ['L1'],
-        'station': ['MTRP', 'PRPP'],
-    },
-    {
-        'project': '3219',
-        'line': ['L1'],
-        'station': ['MTRP', 'PUMP', 'PRPP'],
+        'motor_pairing': {
+            'motor_sn_prefix': '',
+        },
+        'pump_pairing': {
+            'pump_sn_prefix': '',
+        },
+        'carton_pairing': {
+            'carton_label_prefix': '',
+            'ean_number': '',
+        },
     }
 
 ]
@@ -44,4 +26,8 @@ stations = {
     'PRPP': 'Carton_Pairing',
     #'PCBA': 'PCBA_Pairing'
 }
+
+password = "abc12345"
+
+
 

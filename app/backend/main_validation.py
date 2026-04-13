@@ -34,4 +34,15 @@ def validate_wip_number(wip_number):
     if not re.match(pattern, wip_number):
         return False, "WIP Number is not in the correct format."
     
+    # additional logic to check for duplicates
+    
     return True, f"PASS: {wip_number}"
+
+VALIDATORS = {
+    'wip_number': validate_wip_number,
+    'motor_sn': validate_motor_prefix,
+    'pump_sn': validate_pump_prefix,
+    'carton_sn': validate_carton_prefix,
+    'rating_plate': validate_rating_plate,
+    'ean_number': validate_ean_number,
+}

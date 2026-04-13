@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import (QDialog, QLabel, QComboBox, QLineEdit,
+from PySide6.QtWidgets import (QDialog, QLabel, QLineEdit,
                                QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget)
 from PySide6.QtCore import Qt
 import sys

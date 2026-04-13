@@ -1,22 +1,25 @@
 #print("Hello, World!")
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore, QtGui
 from .form_window import ConfigDialog
 from db.connection import Database
 from .constants import fields, stations
 from backend.config_manager import ConfigManager, CONFIG_PATH
 from .category import motor_pairing, pump_pairing, carton_pairing
+from .setting import SettingDialog
+import os
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Offline Pairing")
         self.db = Database()
+        self.db.create_config_table()
         self.resize(1400, 900)
 
         config_manager = ConfigManager(CONFIG_PATH)
         print("Loaded config:", config_manager.config_data)
         dialog = ConfigDialog(fields)
-
+        
         """
         if dialog.exec() == QtWidgets.QDialog.Accepted:
             self.project_data = {
@@ -35,7 +38,19 @@ class MainWindow(QtWidgets.QMainWindow):
             alignment=QtCore.Qt.AlignCenter
         )
         
-        title.setStyleSheet("font-size: 32px; font-weight: bold; color: black; border: 4px solid black; padding: 20px; background-color: yellow;")
+        title.setStyleSheet("font-size: 32px; font-weight: bold;")
+
+        BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # go up from ui/
+        setting_img_path = os.path.join(BASE_DIR, "asset", "setting_button.jpg")
+        setting_btn = QtWidgets.QPushButton("Settings")
+
+        icon = QtGui.QIcon(setting_img_path)
+        print(icon.isNull())
+        setting_btn.setIcon(icon)
+
+        setting_btn.setIconSize(QtCore.QSize(30, 30))
+
+        setting_btn.clicked.connect(lambda: SettingDialog().exec())
 
         if station == "Motor_Pairing":
             pairing = motor_pairing.MotorPairing()
@@ -49,7 +64,32 @@ class MainWindow(QtWidgets.QMainWindow):
 
         main_layout = QtWidgets.QVBoxLayout(central)
 
-        main_layout.addWidget(title)
+        top_container = QtWidgets.QWidget()
+        top_container.setObjectName("top_container")
+        top_container.setStyleSheet("""
+            QWidget#top_container {
+                border: 4px solid black; 
+                padding: 20px; 
+                background-color: yellow;
+            }""")
+        
+        top_container.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+
+        top_layout = QtWidgets.QHBoxLayout(top_container)
+
+        top_layout.setContentsMargins(10, 10, 10, 10)
+        top_layout.setSpacing(10)
+
+        top_layout.addWidget(setting_btn, alignment=QtCore.Qt.AlignLeft, stretch=1)
+        top_layout.addWidget(title, alignment=QtCore.Qt.AlignCenter, stretch=10)
+        top_layout.addWidget(QtWidgets.QWidget(), stretch=1)  # empty space on the right
+
+        #top_layout.setStyleSheet("border: 4px solid black; padding: 20px; background-color: yellow;")
+
+        #main_layout.addLayout(top_layout)
+        main_layout.addWidget(top_container)
+
+        # Interactive Layout
 
         status_bar = QtWidgets.QLabel("Please scan the WIP", alignment=QtCore.Qt.AlignCenter)
         status_bar.setStyleSheet("font-size: 24px; color: black; background-color: lightgray; border: 2px solid white; padding: 10px;")
