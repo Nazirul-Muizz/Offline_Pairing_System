@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import (QDialog, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget)
 from PySide6.QtCore import Qt
 from .auth_user import AuthorizeUser
+from .form_window import ConfigDialog
+from .constants import fields
 
 class SettingDialog(QDialog):
     def __init__(self, title="Settings", size=(300, 150)):
@@ -8,33 +10,40 @@ class SettingDialog(QDialog):
         self.setWindowTitle(title)
         self.setFixedSize(*size)
 
-        AuthDialog = AuthorizeUser()
-        if AuthDialog.exec() == QDialog.Accepted:
-            print("Login success")
-            layout = QVBoxLayout()
+        self.build_ui()
+        self.run_auth()
 
-            label = QLabel("This is the settings dialog.")
-            layout.addWidget(label)
+    def build_ui(self):
+        self.layout = QVBoxLayout()
 
-            btn_layout = QHBoxLayout()
-            btn_layout.addStretch()
+        self.label = QLabel("This is the settings dialog.")
+        self.layout.addWidget(self.label)
 
-            self.register_new_wo_btn = QPushButton("Register New WO")
-            self.config_btn = QPushButton("Configure Features")
+        btn_layout = QHBoxLayout()
 
-            btn_layout.addWidget(self.register_new_wo_btn)
-            btn_layout.addWidget(self.config_btn)
+        self.register_new_wo_btn = QPushButton("Register New WO")
+        self.config_btn = QPushButton("Configure Features")
 
-            layout.addLayout(btn_layout)
+        btn_layout.addWidget(self.register_new_wo_btn)
+        btn_layout.addWidget(self.config_btn)
 
-            self.setLayout(layout)
-        else:
-            print("Login cancelled")
-            self.reject()
+        self.layout.addLayout(btn_layout)
+        self.setLayout(self.layout)
     
-    def closeEvent(self, event):
-        event.accept()
-        
-        
+    def run_auth(self):
+        auth = AuthorizeUser()
+
+        if auth.exec() != QDialog.Accepted:
+            self.block_access()
+    
+    def block_access(self):
+        self.register_new_wo_btn.setEnabled(False)
+        self.config_btn.setEnabled(False)
+
+        self.label.setText("Access Denied")
+
+    def run_config(self):
+        # Placeholder for config logic
+        dialog = ConfigDialog(fields)
 
         

@@ -6,6 +6,7 @@ from .constants import fields, stations
 from backend.config_manager import ConfigManager, CONFIG_PATH
 from .category import motor_pairing, pump_pairing, carton_pairing
 from .setting import SettingDialog
+from .auth_user import AuthorizeUser
 import os
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -18,7 +19,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         config_manager = ConfigManager(CONFIG_PATH)
         print("Loaded config:", config_manager.config_data)
-        dialog = ConfigDialog(fields)
         
         """
         if dialog.exec() == QtWidgets.QDialog.Accepted:
