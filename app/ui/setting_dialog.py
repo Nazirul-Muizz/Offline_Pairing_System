@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (QDialog, QLabel, QComboBox, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget)
 from PySide6.QtCore import Qt
-from .auth_user import AuthorizeUser
+from .auth_user_dialog import AuthorizeUser
 from .register_wo_dialog import RegisterDialog
 from .constants import fields, project, line, station
 from db.connection import Database
